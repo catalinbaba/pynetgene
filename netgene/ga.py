@@ -1,14 +1,12 @@
-from abc import ABC, abstractmethod
 import concurrent.futures
 import threading
-import random
 import time
 
-from netgene.core import Population, Offspring, Individual
+from netgene.core import *
 from netgene.operators.crossover import OnePointCrossover
-from netgene.exception import SelectionException, CrossoverException, MutatorException, GaException
-from netgene.operators.mutator import GaussianMutator
-from netgene.operators.selection import RandomSelector
+from netgene.exception import *
+from netgene.operators.mutator import *
+from netgene.operators.selection import *
 from netgene.utils import ConsolePrinter, TaskExecutor
 import logging
 from concurrent.futures import ThreadPoolExecutor
@@ -37,6 +35,7 @@ class GeneticAlgorithm:
         self._clock = verify_is_not_null(clock)
         self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=n_threads)
         self._printer = printer
+        self.lock = threading.Lock()
 
         self._stop_conditions = []
         self._fitness_function = None
@@ -157,35 +156,36 @@ class GeneticAlgorithm:
 
         self._population.generation = generation_number + 1
 
+        print("!!!!!!!!!!population size: ", len(self._population))
+
         return GenerationResult(evolution_duration, evaluation_duration, self._population.get_best_individual(), self._population.generation)
 
     def _evolution_task(self, limit, new_population):
         individual_stream = []
 
         if not self._skip_crossover:
-            # Generate individuals with crossover
-            for _ in range(limit):
-                if len(individual_stream) >= limit:
-                    break  # Stop if we have reached the limit
+            threads = []
+            # Generate individuals with crossover using ThreadPoolExecutor
+            with concurrent.futures.ThreadPoolExecutor(self._n_threads) as executor:
+                for _ in range(limit):
+                    if len(individual_stream) >= limit:
+                        break  # Stop if we have reached the limit
 
-                couple = self._parents_supplier()  # Select parents
-                if couple:
-                    offspring = self._crossover(couple)
+                    # Submit a crossover operation to the thread pool
+                    future = executor.submit(self.crossover_thread, individual_stream, limit)
+                    threads.append(future)
 
-                    # Add offspring to the stream, but respect the limit
-                    for child in offspring.get_individuals():
-                        if len(individual_stream) < limit:
-                            individual_stream.append(child)
-                        else:
-                            break
+                # Wait for all futures to complete
+                concurrent.futures.wait(threads)
         else:
             # If crossover is skipped, take individuals directly from the current population (up to the limit)
             individual_stream = list(self._population)[:limit]
 
         if not self._skip_mutation:
             # Apply mutation to each individual in the stream
-            for individual in individual_stream:
-                self._mutate(individual)
+            with concurrent.futures.ThreadPoolExecutor(self._n_threads) as executor:
+                for individual in individual_stream:
+                    executor.submit(self._mutate, individual)
 
         # Add individuals from the stream to the new population
         for individual in individual_stream:
@@ -194,17 +194,26 @@ class GeneticAlgorithm:
         # Update the current population with the new population
         self._population = new_population
 
+    def crossover_thread(self, individual_stream, limit):
+        couple = self._parents_supplier()
+        if couple:
+            offspring = self._crossover(couple)
+
+            # Add offspring to the stream, but respect the limit
+            with self.lock:
+                for child in offspring.get_individuals():
+                    if len(individual_stream) < limit:
+                        individual_stream.append(child)
+
     def _parents_supplier(self):
         try:
-            # Attempt to select parents using the parent selector
+             # Attempt to select parents using the parent selector
             parents = self._parent_selector.select_parents(self._population)
-
             # Return the selected parents
             return parents
-        except SelectionException as e:
+        except Exception as e:
             # If an exception (SelectionException) occurs during parent selection, log the error
             logging.exception("Error in parent selection", e)
-
             # Return None to indicate that the parent selection failed
             return None
 
@@ -261,6 +270,7 @@ class GeneticAlgorithm:
         self._stop_conditions.append(custom_stop_condition)
 
 
+
 class GeneticConfiguration:
 
     def __init__(self, parent_selector=None, crossover_operator=None,
@@ -269,7 +279,7 @@ class GeneticConfiguration:
                  target_fitness=float('inf'), skip_crossover=False,
                  skip_mutation=False, n_threads=threading.active_count(),
                  clock=time.time, printer=None):
-        self._parent_selector = parent_selector if parent_selector is not None else RandomSelector()
+        self._parent_selector = parent_selector if parent_selector is not None else RouletteSelector()
         self._crossover_operator = crossover_operator if crossover_operator is not None else OnePointCrossover()
         self._mutator_operator = mutator_operator if mutator_operator is not None else GaussianMutator()
         if mutation_rate <= 0:
@@ -313,7 +323,7 @@ class GeneticConfiguration:
 
     @parent_selector.setter
     def parent_selector(self, parent_selector):
-        self._parent_selector = parent_selector if parent_selector is not None else RandomSelector()
+        self._parent_selector = parent_selector if parent_selector is not None else RouletteSelector()
 
     @property
     def crossover_operator(self):
@@ -526,144 +536,3 @@ def verify_is_not_null(obj):
     if obj is None:
         raise ValueError("Object cannot be None")
     return obj
-
-#
-# class GeneticConfiguration:
-#     """
-#     This class can be used to incrementally construct a GeneticAlgorithm.
-#     """
-#
-#     def __init__(self):
-#         self._crossover_rate = 0.8
-#         self._mutation_rate = 0.05
-#         self._elitism = True
-#         self._elitism_size = 1
-#         self._population_size = 1
-#         self._max_generation = float('inf')
-#         self._parent_selector = RouletteSelector()
-#         # self._offspring_selector = None  # Uncomment and implement if needed
-#         self._crossover_operator = OnePointCrossover()
-#         self._mutator_operator = GaussianMutator()
-#         self._n_threads = threading.active_count()
-#         self._clock = time.time
-#         self._printer = ConsolePrinter()
-#         self._target_fitness = float('inf')
-#         self._generation_limited = False
-#         self._target_fitness_limited = False
-#         self._skip_crossover = False
-#         self._skip_mutation = False
-#
-#     @property
-#     def parent_selector(self, parent_selector):
-#         self._parent_selector = self._verify_is_not_null(parent_selector)
-#         return self
-#
-#     @property
-#     def crossover_operator(self, crossover_operator):
-#         self._crossover_operator = self._verify_is_not_null(crossover_operator)
-#         return self
-#
-#     @property
-#     def mutator_operator(self, mutator_operator):
-#         self._mutator_operator = self._verify_is_not_null(mutator_operator)
-#         return self
-#
-#     @property
-#     def crossover_rate(self, crossover_rate):
-#         if crossover_rate <= 0:
-#             raise GaException("Crossover rate value cannot be negative")
-#         self._crossover_rate = crossover_rate
-#         return self
-#
-#     @property
-#     def mutation_rate(self, mutation_rate):
-#         if mutation_rate <= 0:
-#             raise GaException("Mutation rate value cannot be negative")
-#         self._mutation_rate = mutation_rate
-#         return self
-#
-#     @property
-#     def elitism(self, elitism):
-#         if not isinstance(elitism, bool):
-#             raise GaException("Elitism must be a boolean value")
-#         self._elitism = elitism
-#         return self
-#
-#     @property
-#     def elitism_size(self, elitism_size):
-#         if elitism_size < 0:
-#             raise GaException("Mutation rate value cannot be negative")
-#         self._elitism_size = elitism_size
-#         return self
-#
-#     @property
-#     def max_generation(self, max_generation):
-#         if max_generation <= 0:
-#             raise GaException("Maximum generation cannot be lower than 1")
-#         self._max_generation = max_generation
-#         self._generation_limited = True
-#         return self
-#
-#     @property
-#     def thread_pool_size(self, n_threads):
-#         if n_threads < 1:
-#             raise GaException("Thread Pool Size cannot be lower than 1")
-#         self._n_threads = n_threads
-#         return self
-#
-#     @property
-#     def clock(self, clock):
-#         self._clock = self._verify_is_not_null(clock)
-#         return self
-#
-#     @property
-#     def printer(self, printer):
-#         self._printer = self._verify_is_not_null(printer)
-#         return self
-#
-#     @property
-#     def target_fitness(self, target_fitness):
-#         self._target_fitness = self._verify_is_not_null(target_fitness)
-#         self._target_fitness_limited = True
-#         return self
-#
-#     @property
-#     def skip_crossover(self, skip_crossover):
-#         if not isinstance(skip_crossover, bool):
-#             raise GaException("Skip crossover must be a boolean value")
-#         self._skip_crossover = skip_crossover
-#         return self
-#
-#     @property
-#     def skip_mutation(self, skip_mutation):
-#         if not isinstance(skip_mutation, bool):
-#             raise GaException("Skip mutation must be a boolean value")
-#         self._skip_mutation = skip_mutation
-#         return self
-#
-#     def get_algorithm(self):
-#         # Here, create and return an instance of GeneticAlgorithm with the current configuration.
-#         ga = GeneticAlgorithm(
-#             self._parent_selector,
-#             self._crossover_operator,
-#             self._mutator_operator,
-#             self._crossover_rate,
-#             self._mutation_rate,
-#             self._elitism,
-#             self._elitism_size,
-#             self._max_generation,
-#             self._clock,
-#             self._n_threads,
-#             self._printer,
-#             self._target_fitness,
-#             self._skip_crossover,
-#             self._skip_mutation
-#         )
-#         return ga
-#
-#     @staticmethod
-#     def _verify_is_not_null(obj):
-#         if obj is None:
-#             raise ValueError("Object cannot be None")
-#         return obj
-#

@@ -1,4 +1,4 @@
-from exception import MutatorException
+from netgene.exception import MutatorException
 from netgene.chromosome import *
 from random import shuffle
 

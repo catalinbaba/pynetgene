@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from netgene.core import Individual, Offspring
 from netgene.chromosome import Chromosome
 from netgene.chromosome import PermutationChromosome
-from exception import CrossoverException
+from netgene.exception import CrossoverException
 import random
 
 

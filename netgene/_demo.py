@@ -43,6 +43,7 @@ def generation_tracker(ga: GeneticAlgorithm, result: GenerationResult):
     print("best fitness: ", result.best_fitness)
     print("best individual: ", result.best_individual)
     print("evaluation execution: ", result.evaluation_duration)
+    print("----------------------------------")
 
 def custom_condition(population):
     for individual in population:
@@ -52,7 +53,7 @@ def custom_condition(population):
             return False
 
 
-ga.set_custom_stop_condition(custom_condition)
+#ga.set_custom_stop_condition(custom_condition)
 ga.set_generation_tracker(generation_tracker)
 
 ga.evolve(population, fitness_function)
