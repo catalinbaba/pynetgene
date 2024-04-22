@@ -164,13 +164,15 @@ class GeneticAlgorithm:
         if not self._skip_crossover:
             # Generate individuals with crossover directly without threading
             for _ in range(limit):
+                if len(individual_stream) >= limit:  # if limit is reached
+                    break
                 couple = self._parents_supplier()  #extract two parents from the population
                 offspring = self._crossover(couple)  #create offspring
                 for child in offspring.get_individuals():
                     if len(individual_stream) < limit:   #if limit is not reached
                         individual_stream.append(child)
                     else:
-                        break
+                        break #break if the limit was reached
 
         else:
             # If crossover is skipped, take individuals directly from the current population (up to the limit)
