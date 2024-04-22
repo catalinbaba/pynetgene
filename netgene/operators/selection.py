@@ -68,19 +68,35 @@ class TournamentSelector(ParentSelector):
         return selected
 
 
+# class RankSelector(ParentSelector):
+#
+#     def select(self, population) -> 'Individual':
+#         spin_wheel = 0
+#         population_rank = len(population) * (len(population) + 1) // 2
+#         roulette_wheel_position = random.randint(0, population_rank - 1)
+#
+#         for i in range(len(population), 0, -1):
+#             spin_wheel += i
+#             if spin_wheel > roulette_wheel_position:
+#                 return population[len(population) - i]
+#
+#         #return None  # Unreachable code to make the compiler happy
+
 class RankSelector(ParentSelector):
 
     def select(self, population) -> 'Individual':
-        spin_wheel = 0
-        population_rank = len(population) * (len(population) + 1) // 2
-        roulette_wheel_position = random.randint(0, population_rank - 1)
+        # Sort the population based on fitness; higher fitness should have a higher rank
+        sorted_population = sorted(population, key=lambda x: x.fitness)
+        # Calculate cumulative rank probability
+        total_ranks = len(population) * (len(population) + 1) // 2
+        roulette_wheel_position = random.uniform(0, total_ranks)
+        cumulative_rank = 0
+        for i, individual in enumerate(sorted_population):
+            rank = i + 1  # Assign ranks starting from 1 up to n
+            cumulative_rank += rank
+            if cumulative_rank >= roulette_wheel_position:
+                return individual
 
-        for i in range(len(population), 0, -1):
-            spin_wheel += i
-            if spin_wheel > roulette_wheel_position:
-                return population[len(population) - i]
-
-        #return None  # Unreachable code to make the compiler happy
 
 class RouletteSelector(ParentSelector):
 
