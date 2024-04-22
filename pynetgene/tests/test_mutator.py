@@ -1,8 +1,8 @@
 import pytest
-from netgene.ga import Individual
-from netgene.exception import MutatorException
-from netgene.chromosome import FloatGene, FloatChromosome, BitChromosome, IntegerChromosome, BitGene, IntegerGene
-from netgene.operators.mutator import GaussianMutator, BitFlipMutator, IntegerMutator, InversionMutator, SwapMutator, ScrambleMutator, RandomMutator
+from pynetgene.ga import Individual
+from pynetgene.exception import MutatorException
+from pynetgene.chromosome import FloatGene, FloatChromosome, BitChromosome, IntegerChromosome, BitGene, IntegerGene
+from pynetgene.operators.mutator import GaussianMutator, BitFlipMutator, IntegerMutator, InversionMutator, SwapMutator, ScrambleMutator, RandomMutator
 
 
 @pytest.fixture

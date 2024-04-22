@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from netgene.core import Individual, Offspring
-from netgene.chromosome import Chromosome
-from netgene.chromosome import PermutationChromosome
-from netgene.exception import CrossoverException
+from pynetgene.core import Individual, Offspring
+from pynetgene.chromosome import Chromosome
+from pynetgene.chromosome import PermutationChromosome
+from pynetgene.exception import CrossoverException
 import random
 
 
@@ -305,8 +305,8 @@ class TwoPointCrossover(CrossoverOperator):
         chromosome2.set_gene(index, temp)
 
 #
-# from netgene.chromosome import IntegerChromosome
-# from netgene.gene import IntegerGene
+# from pynetgene.chromosome import IntegerChromosome
+# from pynetgene.gene import IntegerGene
 #
 # ch1 = PermutationChromosome()
 #

@@ -2,12 +2,12 @@ import concurrent.futures
 import threading
 import time
 
-from netgene.core import *
-from netgene.operators.crossover import OnePointCrossover
-from netgene.exception import *
-from netgene.operators.mutator import *
-from netgene.operators.selection import *
-from netgene.utils import ConsolePrinter, TaskExecutor
+from pynetgene.core import *
+from pynetgene.operators.crossover import OnePointCrossover
+from pynetgene.exception import *
+from pynetgene.operators.mutator import *
+from pynetgene.operators.selection import *
+from pynetgene.utils import ConsolePrinter, TaskExecutor
 import logging
 from concurrent.futures import ThreadPoolExecutor
 

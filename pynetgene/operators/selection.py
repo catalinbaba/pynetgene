@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from netgene.exception import SelectionException
+from pynetgene.exception import SelectionException
 import random
 
-from netgene.ga import Individual
+from pynetgene.ga import Individual
 
 
 class ParentSelector(ABC):
@@ -121,8 +121,8 @@ class CompetitionSelector(ParentSelector):
         else:
             return ind2
 
-# from netgene.chromosome import IntegerChromosome
-# from netgene.ga import Individual, Population
+# from pynetgene.chromosome import IntegerChromosome
+# from pynetgene.ga import Individual, Population
 #
 #
 # ind1 = Individual(IntegerChromosome(3))

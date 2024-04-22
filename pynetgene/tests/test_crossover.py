@@ -1,9 +1,9 @@
 import pytest
-from netgene.core import Individual, Offspring
-from netgene.chromosome import Chromosome, PermutationChromosome
-from netgene.exception import CrossoverException
-from netgene.chromosome import FloatGene, FloatChromosome, BitChromosome, IntegerChromosome, BitGene, IntegerGene
-from netgene.operators.crossover import *
+from pynetgene.core import Individual, Offspring
+from pynetgene.chromosome import Chromosome, PermutationChromosome
+from pynetgene.exception import CrossoverException
+from pynetgene.chromosome import FloatGene, FloatChromosome, BitChromosome, IntegerChromosome, BitGene, IntegerGene
+from pynetgene.operators.crossover import *
 
 # Test CrossoverOperator Initialization
 def test_crossover_operator_initialization():

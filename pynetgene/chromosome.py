@@ -2,10 +2,10 @@ import random
 from abc import ABC, abstractmethod
 from typing import List, TypeVar, Generic
 
-from netgene.exception import GaException
-from netgene.gene import BitGene
-from netgene.gene import IntegerGene
-from netgene.gene import FloatGene
+from pynetgene.exception import GaException
+from pynetgene.gene import BitGene
+from pynetgene.gene import IntegerGene
+from pynetgene.gene import FloatGene
 import copy
 
 # Defining a Gene type variable

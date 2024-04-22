@@ -1,9 +1,9 @@
-from netgene.core import Individual
-from netgene.operators.crossover import OnePointCrossover
-from netgene.ga import Population, GeneticConfiguration, GeneticAlgorithm, GenerationResult
-from netgene.operators.mutator import BitFlipMutator
-from netgene.chromosome import *
-from netgene.operators.selection import *
+from pynetgene.core import Individual
+from pynetgene.operators.crossover import OnePointCrossover
+from pynetgene.ga import Population, GeneticConfiguration, GeneticAlgorithm, GenerationResult
+from pynetgene.operators.mutator import BitFlipMutator
+from pynetgene.chromosome import *
+from pynetgene.operators.selection import *
 import math, time
 
 #mutator = BitFlipMutator()
@@ -13,7 +13,7 @@ selector = TournamentSelector(3)
 ga = GeneticConfiguration(crossover_operator=crossover,
                           parent_selector=selector,
                           elitism_size=1,
-                          max_generation=5000,
+                          max_generation=100,
                           n_threads=24
                           ).get_algorithm()
 

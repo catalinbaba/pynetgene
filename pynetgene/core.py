@@ -391,7 +391,7 @@ class Parents:
 
 
 #
-# from netgene.chromosome import IntegerChromosome
+# from pynetgene.chromosome import IntegerChromosome
 #
 # ind1 = Individual(IntegerChromosome(10))
 # ind2 = Individual(IntegerChromosome(10))
