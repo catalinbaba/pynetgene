@@ -1,4 +1,4 @@
-from exception import MutatorException
+from netgene.exception import MutatorException
 from netgene.chromosome import *
 from random import shuffle
 
@@ -79,6 +79,9 @@ class IntegerMutator(MutatorOperator):
         return self._max_range
 
     def mutate(self, individual: Individual):
+        if not isinstance(individual.chromosome, IntegerChromosome):
+            raise MutatorException("Integer Mutator is applicable only for int chromosomes")
+
         chromosome = individual.chromosome
         for i in range(chromosome.length()):
             rand = random.random()

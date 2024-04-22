@@ -42,7 +42,7 @@ class RandomSelector(ParentSelector):
 
 class TournamentSelector(ParentSelector):
 
-    def __init__(self, tournament_size):
+    def __init__(self, tournament_size=1):
         super().__init__()
         if tournament_size < 1:
             raise SelectionException("Tournament size cannot be lower than 1.")
@@ -87,10 +87,9 @@ class RouletteSelector(ParentSelector):
     def select(self, population) -> 'Individual':
         spin_wheel = 0.0
         roulette_wheel_position = random.random() * population.fitness
-
         for i in range(len(population)):
-            spin_wheel = spin_wheel + population[i].fitness
-            if spin_wheel > roulette_wheel_position:
+            spin_wheel += population[i].fitness
+            if spin_wheel >= roulette_wheel_position:
                 return population[i]
 
 class CompetitionSelector(ParentSelector):

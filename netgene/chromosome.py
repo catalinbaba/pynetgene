@@ -143,7 +143,7 @@ class IntegerChromosome(NumericChromosome[IntegerGene]):
         self._chromosome.insert(index, gene)
 
     def to_list(self) -> List[int]:
-        return [gene.get_allele() for gene in self._chromosome]
+        return [gene.allele for gene in self._chromosome]
 
     def copy(self) -> 'IntegerChromosome':
         new_chromosome = IntegerChromosome()
@@ -192,7 +192,7 @@ class FloatChromosome(NumericChromosome[FloatGene]):
         self._chromosome.insert(index, gene)
 
     def to_list(self) -> List[float]:
-        return [gene.get_allele() for gene in self._chromosome]
+        return [gene.allele for gene in self._chromosome]
 
     def copy(self) -> 'FloatChromosome':
         new_chromosome = FloatChromosome()

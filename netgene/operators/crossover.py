@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from netgene.core import Individual, Offspring
 from netgene.chromosome import Chromosome
 from netgene.chromosome import PermutationChromosome
-from exception import CrossoverException
+from netgene.exception import CrossoverException
 import random
 
 
@@ -62,6 +62,8 @@ class OnePointCrossover(CrossoverOperator):
 
 class FixedPointCrossover(CrossoverOperator):
     def __init__(self, fixed_point, single_offspring=False):
+        if fixed_point < 0:
+            raise CrossoverException("Fixed point must take a positive value")
         super().__init__(single_offspring)
         self._fixed_point = fixed_point
 
@@ -213,6 +215,7 @@ class Order1Crossover(CrossoverOperator):
         for i in range(first_crossover_point, second_crossover_point):
             offspring.add_gene(first_parent.get_gene(i))
 
+        #start from the right
         if second_crossover_point != first_parent.length():
             for i in range(second_crossover_point, second_parent.length()):
                 if second_parent.get_gene(i) not in offspring:
@@ -229,6 +232,78 @@ class Order1Crossover(CrossoverOperator):
                     j += 1
 
         return offspring
+
+class UniformCrossover(CrossoverOperator):
+
+    def __init__(self, probability=0.5, single_offspring: bool = False):
+        if not 0 <= probability <= 1:
+            raise CrossoverException("Probability must take a value between 0.0 and 1.0")
+        super().__init__(single_offspring)
+        self._probability = probability
+
+    def recombine(self, x: Individual, y: Individual) -> Offspring:
+        first_offspring = x.chromosome.copy()
+        second_offspring = y.chromosome.copy()
+        if isinstance(first_offspring, PermutationChromosome) or isinstance(second_offspring, PermutationChromosome):
+            raise CrossoverException(
+                "Permutation Chromosomes are not allowed")
+        if first_offspring.length() != second_offspring.length():
+            raise CrossoverException("Cannot recombine chromosomes with different lengths.")
+
+        for i in range(first_offspring.length()):
+            if random.random() < self.probability:
+                self.swap(first_offspring, second_offspring, i)
+
+        offspring = Offspring()
+        offspring.add_offspring(Individual(first_offspring))
+        if not self.single_offspring:
+            offspring.add_offspring(Individual(second_offspring))
+
+        return offspring
+
+    def swap(self, chromosome1: Chromosome, chromosome2: Chromosome, index: int):
+        temp = chromosome1.get_gene(index)
+        chromosome1.set_gene(index, chromosome2.get_gene(index))
+        chromosome2.set_gene(index, temp)
+
+    @property
+    def probability(self):
+        return self._probability
+
+class TwoPointCrossover(CrossoverOperator):
+    def __init__(self, single_offspring=False):
+        super().__init__(single_offspring)
+
+    def recombine(self, x: Individual, y: Individual) -> Offspring:
+        first_offspring = x.chromosome.copy()
+        second_offspring = y.chromosome.copy()
+
+        if isinstance(first_offspring, PermutationChromosome) or isinstance(second_offspring, PermutationChromosome):
+            raise CrossoverException("Cannot use Two Point Crossover for Permutation Chromosome. Only Permutation Crossover Operators are allowed")
+        if first_offspring.length() != second_offspring.length():
+            raise CrossoverException("Cannot recombine chromosomes with different lengths")
+        if first_offspring.length() < 3:
+            raise CrossoverException("Multi point crossover cannot work if chromosome length is lower than 3")
+
+        # Generate two crossover points
+        first_crossover_point = random.randint(0, first_offspring.length() - 2)
+        second_crossover_point = random.randint(first_crossover_point + 1, first_offspring.length() - 1)
+
+        for i in range(first_crossover_point, second_crossover_point):
+            self.swap(first_offspring, second_offspring, i)
+
+        offspring = Offspring()
+        offspring.add_offspring(Individual(first_offspring))
+        if not self.single_offspring:
+            offspring.add_offspring(Individual(second_offspring))
+
+        return offspring
+
+    def swap(self, chromosome1: Chromosome, chromosome2: Chromosome, index: int):
+        temp = chromosome1.get_gene(index)
+        chromosome1.set_gene(index, chromosome2.get_gene(index))
+        chromosome2.set_gene(index, temp)
+
 #
 # from netgene.chromosome import IntegerChromosome
 # from netgene.gene import IntegerGene
