@@ -7,7 +7,7 @@ setup(
     author_email="catalin.viorelbaba@gmail.com",
     packages=find_packages(),
     install_requires=[
-        'pytest>=8.1.1',
+        "pytest",
     ],
     description="PyNetgene: A Python Library for Building the Genetic Algorithm"
 
