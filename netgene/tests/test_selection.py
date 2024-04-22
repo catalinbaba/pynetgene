@@ -96,3 +96,45 @@ def test_rank_selection_incest_prevention():
     ind1, ind2 = selector.select_parents(population)
     assert ind1 != ind2, "Incest prevention should avoid selecting the same individual"
 
+
+#####################Roulette Selection#########################
+
+# Test the basic functionality where selection should be biased towards higher fitness individuals
+def test_roulette_selection_biased_towards_higher_fitness():
+    population = create_population_with_fitness([1, 2, 3, 4, 10])
+    selector = RouletteSelector()
+    outcomes = {}
+    for _ in range(1000):
+        selected = selector.select(population)
+        outcomes[selected.fitness] = outcomes.get(selected.fitness, 0) + 1
+
+    # Expect more selections of higher fitness individuals
+    assert outcomes[10] > outcomes[1], "Higher fitness individuals should be selected more frequently"
+
+# Test behavior with a single individual in the population
+def test_roulette_selection_single_individual_population():
+    population = create_population_with_fitness([10])
+    selector = RouletteSelector()
+    selected = selector.select(population)
+    assert selected.fitness == 10, "The only individual should be selected"
+
+# Test randomness of the roulette selection
+def test_roulette_selection_randomness_in_roulette_selection():
+    population = create_population_with_fitness([5, 5, 5, 5, 5])
+    selector = RouletteSelector()
+    outcomes = {}
+    for _ in range(1000):
+        selected = selector.select(population)
+        outcomes[selected.fitness] = outcomes.get(selected.fitness, 0) + 1
+
+    # Checking for uniform distribution across individuals with the same fitness
+    assert len(set(outcomes.values())) == 1, "Selection should be evenly distributed among individuals of the same fitness"
+
+# Test the incest prevention feature
+def test_roulette_selection_incest_prevention():
+    population = create_population_with_fitness([1, 2, 3, 4, 5])
+    selector = RouletteSelector()
+    selector.incest_prevention = True
+    ind1, ind2 = selector.select_parents(population)
+    assert ind1 != ind2, "Incest prevention should avoid selecting the same individual"
+
