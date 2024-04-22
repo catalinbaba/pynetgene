@@ -164,11 +164,13 @@ class GeneticAlgorithm:
         if not self._skip_crossover:
             # Generate individuals with crossover directly without threading
             for _ in range(limit):
-                if len(individual_stream) >= limit:
-                    break  # Stop if we have reached the limit
-
-                # Call crossover method directly
-                individual_stream.extend(self.crossover_thread())
+                couple = self._parents_supplier()  #extract two parents from the population
+                offspring = self._crossover(couple)  #create offspring
+                for child in offspring.get_individuals():
+                    if len(individual_stream) < limit:   #if limit is not reached
+                        individual_stream.append(child)
+                    else:
+                        break
 
         else:
             # If crossover is skipped, take individuals directly from the current population (up to the limit)
@@ -186,16 +188,16 @@ class GeneticAlgorithm:
         # Update the current population with the new population
         self._population = new_population
 
-    def crossover_thread(self, individual_stream, limit):
-        couple = self._parents_supplier()
-        if couple:
-            offspring = self._crossover(couple)
-
-            # Add offspring to the stream, but respect the limit
-            with self.lock:
-                for child in offspring.get_individuals():
-                    if len(individual_stream) < limit:
-                        individual_stream.append(child)
+    # def crossover_thread(self, individual_stream, limit):
+    #     couple = self._parents_supplier()
+    #     if couple:
+    #         offspring = self._crossover(couple)
+    #
+    #         # Add offspring to the stream, but respect the limit
+    #         with self.lock:
+    #             for child in offspring.get_individuals():
+    #                 if len(individual_stream) < limit:
+    #                     individual_stream.append(child)
 
     def _parents_supplier(self):
         try:
