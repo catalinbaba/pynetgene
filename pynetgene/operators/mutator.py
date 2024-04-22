@@ -1,8 +1,8 @@
-from netgene.exception import MutatorException
-from netgene.chromosome import *
+from pynetgene.exception import MutatorException
+from pynetgene.chromosome import *
 from random import shuffle
 
-from netgene.ga import Individual
+from pynetgene.ga import Individual
 
 
 class MutatorOperator(ABC):
@@ -162,7 +162,7 @@ class RandomMutator(GaussianMutator):
                 chromosome.set_gene(i, gene)
 
 #
-# from netgene.ga import Individual
+# from pynetgene.ga import Individual
 #
 # ch1 = FloatChromosome()
 #

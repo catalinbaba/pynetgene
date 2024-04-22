@@ -1,9 +1,9 @@
 import pytest
 
-from netgene.core import Population
-from netgene.exception import SelectionException
-from netgene.ga import Individual
-from netgene.operators.selection import *
+from pynetgene.core import Population
+from pynetgene.exception import SelectionException
+from pynetgene.ga import Individual
+from pynetgene.operators.selection import *
 
 # Helper function to create a population with specified fitness values
 def create_population_with_fitness(fitness_values):
