@@ -328,6 +328,25 @@ class Offspring:
         return self._offspring
 
 
+    def __getitem__(self, index: int) -> Individual:
+        """
+        Allows for bracket notation access (e.g., offspring[2]).
+
+        :param index: Index of the desired offspring.
+        :return: Offspring at the specified index.
+        """
+        return self._offspring[index]
+
+    def __setitem__(self, index: int, individual: Individual):
+        """
+        Allows for bracket notation setting (e.g., offspring[2] = new_individual).
+
+        :param index: Index where the individual should be set.
+        :param individual: New individual to place at the specified index.
+        """
+        self._offspring[index] = individual
+
+
 class Parents:
     """
     Parents class holds two individuals.

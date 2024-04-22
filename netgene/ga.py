@@ -156,36 +156,28 @@ class GeneticAlgorithm:
 
         self._population.generation = generation_number + 1
 
-        print("!!!!!!!!!!population size: ", len(self._population))
-
         return GenerationResult(evolution_duration, evaluation_duration, self._population.get_best_individual(), self._population.generation)
 
     def _evolution_task(self, limit, new_population):
         individual_stream = []
 
         if not self._skip_crossover:
-            threads = []
-            # Generate individuals with crossover using ThreadPoolExecutor
-            with concurrent.futures.ThreadPoolExecutor(self._n_threads) as executor:
-                for _ in range(limit):
-                    if len(individual_stream) >= limit:
-                        break  # Stop if we have reached the limit
+            # Generate individuals with crossover directly without threading
+            for _ in range(limit):
+                if len(individual_stream) >= limit:
+                    break  # Stop if we have reached the limit
 
-                    # Submit a crossover operation to the thread pool
-                    future = executor.submit(self.crossover_thread, individual_stream, limit)
-                    threads.append(future)
+                # Call crossover method directly
+                individual_stream.extend(self.crossover_thread())
 
-                # Wait for all futures to complete
-                concurrent.futures.wait(threads)
         else:
             # If crossover is skipped, take individuals directly from the current population (up to the limit)
             individual_stream = list(self._population)[:limit]
 
         if not self._skip_mutation:
-            # Apply mutation to each individual in the stream
-            with concurrent.futures.ThreadPoolExecutor(self._n_threads) as executor:
-                for individual in individual_stream:
-                    executor.submit(self._mutate, individual)
+            # Apply mutation to each individual in the stream without threading
+            for individual in individual_stream:
+                self._mutate(individual)
 
         # Add individuals from the stream to the new population
         for individual in individual_stream:
@@ -259,6 +251,8 @@ class GeneticAlgorithm:
         # Using ThreadPoolExecutor to parallelize fitness calculation
         with ThreadPoolExecutor() as executor:
             executor.map(self._fitness_function, self._population)
+        # for individual in self._population:
+        #     self._fitness_function(individual)
 
     def _has_reached_stop_condition(self):
         return any(stop_condition(self._population) for stop_condition in self._stop_conditions)
