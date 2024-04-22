@@ -26,6 +26,13 @@ def integer_individual():
         chromosome.add_gene(IntegerGene(i))
     return Individual(chromosome)
 
+@pytest.fixture
+def integer_individual2():
+    chromosome = IntegerChromosome()
+    for i in range(100):
+        chromosome.add_gene(IntegerGene(i))
+    return Individual(chromosome)
+
 def test_gaussian_mutator_mutation_rate():
     mutator = GaussianMutator()
     assert mutator.mutation_rate == 0.05
@@ -70,18 +77,18 @@ def test_integer_mutator_fnct1(integer_individual):
             break  # Stop checking once a mutation is found
     assert mutation_occurred, "Mutation did not occur"
 
-def test_scramble_mutator_fnct1(integer_individual):
+def test_scramble_mutator_fnct1(integer_individual2):
     mutator = ScrambleMutator()
     mutator.mutation_rate = 1.0
-    original_genes = [gene.allele for gene in integer_individual.chromosome]
-    mutator.mutate(integer_individual)
-    mutated_genes = [gene.allele for gene in integer_individual.chromosome]
+    original_genes = [gene.allele for gene in integer_individual2.chromosome]
+    mutator.mutate(integer_individual2)
+    mutated_genes = [gene.allele for gene in integer_individual2.chromosome]
     isMutated = False
     for i in range(len(original_genes)):
         if original_genes[i] != mutated_genes[i]:
             isMutated = True
             break
-    assert isMutated , "Mutation did not occur as expected"
+    assert isMutated, "Mutation did not occur as expected"
 
 def test_inversion_mutator_fnct1(integer_individual):
     mutator = InversionMutator()
