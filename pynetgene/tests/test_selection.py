@@ -138,3 +138,39 @@ def test_roulette_selection_incest_prevention():
     ind1, ind2 = selector.select_parents(population)
     assert ind1 != ind2, "Incest prevention should avoid selecting the same individual"
 
+#################################Competition Selector######################
+
+# Test the basic functionality of selecting the higher fitness individual
+def test_competition_selector_basic():
+    population = create_population_with_fitness([1, 10])
+    selector = CompetitionSelector()
+    selected = selector.select(population)
+    assert selected.fitness == 10, "Selector should return the individual with higher fitness"
+
+# Test behavior with a minimum valid population
+def test_competition_selector_min_population():
+    population = create_population_with_fitness([5, 15])
+    selector = CompetitionSelector()
+    selected = selector.select(population)
+    assert selected.fitness == 15, "Selector should return the individual with higher fitness from a two-person population"
+
+# Test randomness and fairness of selection
+def test_competition_selector_fairness():
+    population = create_population_with_fitness([1, 2, 3, 4, 5])
+    selector = CompetitionSelector()
+    results = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    num_trials = 1000
+    for _ in range(num_trials):
+        selected = selector.select(population)
+        results[selected.fitness] += 1
+
+    # Check if higher fitness individuals are indeed more likely to win
+    assert all(results[i] < results[i+1] for i in range(1, 5)), "Higher fitness individuals should win more frequently"
+
+# Test the incest prevention mechanism
+def test_competition_selector_incest_prevention():
+    population = create_population_with_fitness([1, 2, 3, 4, 5])
+    selector = CompetitionSelector()
+    selector.incest_prevention = True
+    ind1, ind2 = selector.select_parents(population)
+    assert ind1 != ind2, "Incest prevention should ensure two different individuals are selected"
