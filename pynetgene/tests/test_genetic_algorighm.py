@@ -189,7 +189,7 @@ def test_ga_integer_funct4():
                               ).get_algorithm()
 
     population = Population()
-    populationSize = 20
+    populationSize = 30
     chromosomeSize = 3
 
     for i in range(populationSize):
