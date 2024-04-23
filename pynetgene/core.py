@@ -37,6 +37,14 @@ class Individual:
     def fitness(self, fitness):
         self._fitness_score = fitness
 
+    @property
+    def custom_data(self):
+        return self._custom_data
+
+    @custom_data.setter
+    def custom_data(self, custom_data):
+        self._custom_data = custom_data
+
     def __lt__(self, other):
         """
         Compare two individuals by fitness value.

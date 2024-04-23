@@ -13,7 +13,7 @@ selector = TournamentSelector(3)
 ga = GeneticConfiguration(crossover_operator=crossover,
                           parent_selector=selector,
                           elitism_size=1,
-                          max_generation=100,
+                          max_generation=3,
                           n_threads=24
                           ).get_algorithm()
 
