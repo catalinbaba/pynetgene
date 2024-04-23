@@ -55,7 +55,7 @@ class GeneticAlgorithm:
         if 0.0 <= new_mutation_rate <= 1.0:
             self._mutation_rate = new_mutation_rate
         else:
-            raise ValueError("Mutation rate must be between 0.0 and 1.0")
+            raise GaException("Mutation rate must be between 0.0 and 1.0")
 
     @property
     def crossover_rate(self):
@@ -66,7 +66,7 @@ class GeneticAlgorithm:
         if 0.0 <= new_crossover_rate <= 1.0:
             self._mutation_rate = new_crossover_rate
         else:
-            raise ValueError("Crossover rate must be between 0.0 and 1.0")
+            raise GaException("Crossover rate must be between 0.0 and 1.0")
 
     @property
     def elitism(self):
@@ -78,7 +78,7 @@ class GeneticAlgorithm:
         if isinstance(new_elitism, bool):
             self._elitism = new_elitism
         else:
-            raise ValueError("Elitism must be either True or False")
+            raise GaException("Elitism must be either True or False")
 
     @property
     def elitism_size(self):
@@ -105,10 +105,10 @@ class GeneticAlgorithm:
 
     @mutator_operator.setter
     def mutator_operator(self, new_mutator_operator):
-        if new_mutator_operator is not None:
-            self._mutator_operator = new_mutator_operator
+        if not isinstance(new_mutator_operator, MutatorOperator):
+            raise GaException("Mutator operator must be an instance of MutatorOperator")
         else:
-            raise GaException("Mutator Operator cannot be None")
+            self._mutator_operator = new_mutator_operator
 
     @property
     def crossover_operator(self):
@@ -116,10 +116,11 @@ class GeneticAlgorithm:
 
     @crossover_operator.setter
     def crossover_operator(self, new_crossover_operator):
-        if new_crossover_operator is not None:
-            self._crossover_operator = new_crossover_operator
+        if not isinstance(new_crossover_operator, CrossoverOperator):
+            raise GaException("Crossover operator must be an instance of CrossoverOperator")
         else:
-            raise GaException("Crossover Operator cannot be None")
+            self._crossover_operator = new_crossover_operator
+
 
     def evolve(self, population, fitness_function):
         self._population = population
@@ -268,9 +269,10 @@ class GeneticAlgorithm:
         return any(stop_condition(self._population) for stop_condition in self._stop_conditions)
 
     def set_generation_tracker(self, tracker):
-        self._generation_tracker = tracker
+        self._generation_tracker = verify_is_not_null(tracker)
 
     def set_custom_stop_condition(self, custom_stop_condition):
+        verify_is_not_null(custom_stop_condition)
         self._stop_conditions.append(custom_stop_condition)
 
 
@@ -341,168 +343,170 @@ class GeneticConfiguration:
         self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=n_threads)
         self._printer = printer if printer is not None else ConsolePrinter()
 
-    @property
-    def parent_selector(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @parent_selector.setter
-    def parent_selector(self, parent_selector):
-        self._parent_selector = parent_selector if parent_selector is not None else RouletteSelector()
-
-    @property
-    def crossover_operator(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @crossover_operator.setter
-    def crossover_operator(self, crossover_operator):
-        self._crossover_operator = crossover_operator if crossover_operator is not None else OnePointCrossover()
-
-    @property
-    def mutator_operator(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @mutator_operator.setter
-    def mutator_operator(self, mutator_operator):
-        self._mutator_operator = mutator_operator if mutator_operator is not None else GaussianMutator()
-
-    @property
-    def crossover_rate(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @crossover_rate.setter
-    def crossover_rate(self, crossover_rate):
-        if crossover_rate <= 0:
-            raise GaException("Crossover rate value cannot be negative")
-        if crossover_rate > 1.0:
-            raise GaException("Crossover rate value cannot be higher than 1.0")
-        self._crossover_rate = crossover_rate
-
-    @property
-    def mutation_rate(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @mutation_rate.setter
-    def mutation_rate(self, mutation_rate):
-        if mutation_rate <= 0:
-            raise GaException("Mutation rate value cannot be negative")
-        if mutation_rate > 1.0:
-            raise GaException("Mutation rate value cannot be higher than 1.0")
-        self._mutation_rate = mutation_rate
-        self._mutator_operator.mutation_rate = mutation_rate
-
-    @property
-    def elitism(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @elitism.setter
-    def elitism(self, elitism):
-        if not isinstance(elitism, bool):
-            raise GaException("Elitism must be a boolean value")
-        self._elitism = elitism
-
-    @property
-    def elitism_size(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @elitism_size.setter
-    def elitism_size(self, elitism_size):
-        if elitism_size < 0:
-            raise GaException("Elitism size cannot be negative")
-        self._elitism_size = elitism_size
-
-    @property
-    def max_generation(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @max_generation.setter
-    def max_generation(self, max_generation):
-        if max_generation <= 0:
-            raise GaException("Maximum generation cannot be lower than 1")
-        self._max_generation = max_generation
-
-    @property
-    def target_fitness(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @target_fitness.setter
-    def target_fitness(self, target_fitness):
-        self._target_fitness = verify_is_not_null(target_fitness)
-
-    @property
-    def skip_crossover(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @skip_crossover.setter
-    def skip_crossover(self, skip_crossover):
-        if not isinstance(skip_crossover, bool):
-            raise GaException("skip_crossover must be a boolean value")
-        self._skip_crossover = skip_crossover
-
-    @property
-    def skip_mutation(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @skip_mutation.setter
-    def skip_mutation(self, skip_mutation):
-        if not isinstance(skip_mutation, bool):
-            raise GaException("skip_mutation must be a boolean value")
-        self._skip_mutation = skip_mutation
-
-    @property
-    def n_threads(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @n_threads.setter
-    def n_threads(self, n_threads):
-        if n_threads < 1:
-            raise GaException("Thread Pool Size cannot be lower than 1")
-        self._n_threads = n_threads
-
-    @property
-    def clock(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @clock.setter
-    def clock(self, clock):
-        self._clock = verify_is_not_null(clock)
-
-    @property
-    def printer(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @printer.setter
-    def printer(self, printer):
-        self._printer = printer
-
-    @property
-    def executor(self):
-        # This is a dummy getter to satisfy the @property decorator
-        pass
-
-    @executor.setter
-    def executor(self, executor):
-        self._executor = executor
-
     def get_algorithm(self):
         ga = GeneticAlgorithm(self._parent_selector, self._crossover_operator, self._mutator_operator,
                               self._crossover_rate, self._mutation_rate, self._elitism, self._elitism_size,
                               self._max_generation, self._target_fitness, self._skip_crossover, self._skip_mutation,
                               self._n_threads, self._clock, self._printer)
         return ga
+
+    # @property
+    # def parent_selector(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @parent_selector.setter
+    # def parent_selector(self, parent_selector):
+    #     self._parent_selector = parent_selector if parent_selector is not None else RouletteSelector()
+    #
+    # @property
+    # def crossover_operator(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @crossover_operator.setter
+    # def crossover_operator(self, crossover_operator):
+    #     self._crossover_operator = crossover_operator if crossover_operator is not None else OnePointCrossover()
+    #
+    # @property
+    # def mutator_operator(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @mutator_operator.setter
+    # def mutator_operator(self, mutator_operator):
+    #     self._mutator_operator = mutator_operator if mutator_operator is not None else GaussianMutator()
+    #
+    # @property
+    # def crossover_rate(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @crossover_rate.setter
+    # def crossover_rate(self, crossover_rate):
+    #     if crossover_rate <= 0:
+    #         raise GaException("Crossover rate value cannot be negative")
+    #     if crossover_rate > 1.0:
+    #         raise GaException("Crossover rate value cannot be higher than 1.0")
+    #     self._crossover_rate = crossover_rate
+    #
+    # @property
+    # def mutation_rate(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @mutation_rate.setter
+    # def mutation_rate(self, mutation_rate):
+    #     if mutation_rate <= 0:
+    #         raise GaException("Mutation rate value cannot be negative")
+    #     if mutation_rate > 1.0:
+    #         raise GaException("Mutation rate value cannot be higher than 1.0")
+    #     self._mutation_rate = mutation_rate
+    #     self._mutator_operator.mutation_rate = mutation_rate
+    #
+    # @property
+    # def elitism(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @elitism.setter
+    # def elitism(self, elitism):
+    #     if not isinstance(elitism, bool):
+    #         raise GaException("Elitism must be a boolean value")
+    #     self._elitism = elitism
+    #
+    # @property
+    # def elitism_size(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @elitism_size.setter
+    # def elitism_size(self, elitism_size):
+    #     if elitism_size < 0:
+    #         raise GaException("Elitism size cannot be negative")
+    #     self._elitism_size = elitism_size
+    #
+    # @property
+    # def max_generation(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @max_generation.setter
+    # def max_generation(self, max_generation):
+    #     if max_generation <= 0:
+    #         raise GaException("Maximum generation cannot be lower than 1")
+    #     self._max_generation = max_generation
+    #
+    # @property
+    # def target_fitness(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @target_fitness.setter
+    # def target_fitness(self, target_fitness):
+    #     self._target_fitness = verify_is_not_null(target_fitness)
+    #
+    # @property
+    # def skip_crossover(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @skip_crossover.setter
+    # def skip_crossover(self, skip_crossover):
+    #     if not isinstance(skip_crossover, bool):
+    #         raise GaException("skip_crossover must be a boolean value")
+    #     self._skip_crossover = skip_crossover
+    #
+    # @property
+    # def skip_mutation(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @skip_mutation.setter
+    # def skip_mutation(self, skip_mutation):
+    #     if not isinstance(skip_mutation, bool):
+    #         raise GaException("skip_mutation must be a boolean value")
+    #     self._skip_mutation = skip_mutation
+    #
+    # @property
+    # def n_threads(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @n_threads.setter
+    # def n_threads(self, n_threads):
+    #     if n_threads < 1:
+    #         raise GaException("Thread Pool Size cannot be lower than 1")
+    #     self._n_threads = n_threads
+    #
+    # @property
+    # def clock(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @clock.setter
+    # def clock(self, clock):
+    #     self._clock = verify_is_not_null(clock)
+    #
+    # @property
+    # def printer(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @printer.setter
+    # def printer(self, printer):
+    #     self._printer = printer
+    #
+    # @property
+    # def executor(self):
+    #     # This is a dummy getter to satisfy the @property decorator
+    #     pass
+    #
+    # @executor.setter
+    # def executor(self, executor):
+    #     self._executor = executor
+
+
 
 class GenerationResult:
     def __init__(self, evolution_duration, evaluation_duration, individual, generation_number):
