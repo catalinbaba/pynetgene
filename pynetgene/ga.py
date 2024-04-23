@@ -3,7 +3,7 @@ import threading
 import time
 
 from pynetgene.core import *
-from pynetgene.operators.crossover import OnePointCrossover
+from pynetgene.operators.crossover import OnePointCrossover, CrossoverOperator
 from pynetgene.exception import *
 from pynetgene.operators.mutator import *
 from pynetgene.operators.selection import *
@@ -124,12 +124,18 @@ class GeneticAlgorithm:
     def evolve(self, population, fitness_function):
         self._population = population
         self._fitness_function = fitness_function
-
-        while not self._has_reached_stop_condition():  # as long as the stop condition is not reached
-            result = self._evolve_generation()                  # evolve
+        while True:
+            result = self._evolve_generation()
             if self._generation_tracker is not None:
                 self._generation_tracker(self, result)
-        self._executor.shutdown()                      #shut down the executor - free up the system resources used by executor
+            if self._has_reached_stop_condition():
+                break
+        self._executor.shutdown()  # shut down the executor - free up the system resources used by executor
+
+        # while not self._has_reached_stop_condition():  # as long as the stop condition is not reached
+        #     result = self._evolve_generation()                  # evolve
+        #     if self._generation_tracker is not None:
+        #         self._generation_tracker(self, result)
 
 
     def _evolve_generation(self):
@@ -277,9 +283,30 @@ class GeneticConfiguration:
                  target_fitness=float('inf'), skip_crossover=False,
                  skip_mutation=False, n_threads=threading.active_count(),
                  clock=time.time, printer=None):
-        self._parent_selector = parent_selector if parent_selector is not None else RouletteSelector()
-        self._crossover_operator = crossover_operator if crossover_operator is not None else OnePointCrossover()
-        self._mutator_operator = mutator_operator if mutator_operator is not None else GaussianMutator()
+
+        ###################parent selector#################################
+        if parent_selector is None:
+            self._parent_selector = RouletteSelector()
+        elif not isinstance(parent_selector, ParentSelector):
+            raise GaException("Parent Selector operator must be an instance of ParentSelector")
+        else:
+            self._parent_selector = parent_selector
+        ####################crossover operator###############################
+        if crossover_operator is None:
+            self._crossover_operator = OnePointCrossover()
+        elif not isinstance(crossover_operator, CrossoverOperator):
+            raise GaException("Crossover operator must be an instance of CrossoverOperator")
+        else:
+            self._crossover_operator = crossover_operator
+        ####################mutator_operator#################################
+        if mutator_operator is None:
+            self._mutator_operator = GaussianMutator()
+        elif not isinstance(mutator_operator, MutatorOperator):
+            raise GaException("Mutator operator must be an instance of MutatorOperator")
+        else:
+            self._mutator_operator = mutator_operator
+
+
         if mutation_rate <= 0:
             raise GaException("Mutation rate value cannot be negative")
         if mutation_rate > 1.0:
