@@ -4,6 +4,8 @@ from pynetgene.ga import GeneticConfiguration, GenerationResult, GeneticAlgorith
 from pynetgene.operators.mutator import BitFlipMutator
 from pynetgene.tests.test_genetic_algorighm import lesson1_fitness
 
+import pynetgene.ga
+
 
 def lesson1_fitness(individual):
     fitness = 0
