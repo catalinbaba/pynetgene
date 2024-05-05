@@ -33,7 +33,7 @@ class OnePointCrossover(CrossoverOperator):
     def __init__(self, single_offspring=False):
         super().__init__(single_offspring)
 
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
         first_offspring = x.chromosome.copy()
         second_offspring = y.chromosome.copy()
 
@@ -44,18 +44,14 @@ class OnePointCrossover(CrossoverOperator):
         if first_offspring.length() != second_offspring.length():
             raise CrossoverException("Cannot recombine chromosomes with different lengths")
 
-        offspring = Offspring()
-
         crossover_point = random.randint(0, first_offspring.length() - 1)
 
         for i in range(crossover_point, first_offspring.length()):
             self.swap(first_offspring, second_offspring, i)
 
+        offspring = [Individual(first_offspring)]
         if not self.single_offspring:
-            offspring.add_offspring(Individual(first_offspring))
-            offspring.add_offspring(Individual(second_offspring))
-        else:
-            offspring.add_offspring(Individual(first_offspring))
+            offspring.append(Individual(second_offspring))
 
         return offspring
 
@@ -71,7 +67,7 @@ class FixedPointCrossover(CrossoverOperator):
     def fixed_point(self):
         return self._fixed_point
 
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
 
         """
         Combine two individuals using the Fixed Point Crossover method.
@@ -102,16 +98,12 @@ class FixedPointCrossover(CrossoverOperator):
         if self._fixed_point < 0:
             raise CrossoverException("Fixed crossover point is less than 0")
 
-        offspring = Offspring()
-
         for i in range(self._fixed_point, first_offspring.length()):
             self.swap(first_offspring, second_offspring, i)
 
+        offspring = [Individual(first_offspring)]
         if not self.single_offspring:
-            offspring.add_offspring(Individual(first_offspring))
-            offspring.add_offspring(Individual(second_offspring))
-        else:
-            offspring.add_offspring(Individual(first_offspring))
+            offspring.append(Individual(second_offspring))
 
         return offspring
 
@@ -131,7 +123,7 @@ class HalfPointCrossover(CrossoverOperator):
         """
         super().__init__(single_offspring)
 
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
         """
         Combine two individuals using the Half Point Crossover method.
 
@@ -159,8 +151,6 @@ class HalfPointCrossover(CrossoverOperator):
         if first_offspring.length() != second_offspring.length():
             raise CrossoverException("Cannot recombine chromosomes with different lengths")
 
-        # Create an empty Offspring object
-        offspring = Offspring()
 
         # Determine the crossover point at the middle of the chromosome
         crossover_point = first_offspring.length() // 2
@@ -169,12 +159,9 @@ class HalfPointCrossover(CrossoverOperator):
         for i in range(crossover_point, first_offspring.length()):
             self.swap(first_offspring, second_offspring, i)
 
-        # Add the resulting offspring(s) to the Offspring object
+        offspring = [Individual(first_offspring)]
         if not self.single_offspring:
-            offspring.add_offspring(Individual(first_offspring))
-            offspring.add_offspring(Individual(second_offspring))
-        else:
-            offspring.add_offspring(Individual(first_offspring))
+            offspring.append(Individual(second_offspring))
 
         return offspring
 
@@ -184,21 +171,17 @@ class Order1Crossover(CrossoverOperator):
     def __init__(self, single_offspring: bool = False):
         super().__init__(single_offspring)
 
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
         if not isinstance(x.chromosome, PermutationChromosome) or not isinstance(y.chromosome, PermutationChromosome):
             raise CrossoverException("Order 1 Crossover can be used only for Permutation Chromosome")
 
         if x.chromosome.length() != y.chromosome.length():
             raise CrossoverException("Cannot recombine chromosomes with different lengths")
 
-        offspring = Offspring()
-
+        offspring = []
+        offspring.append(Individual(self._get_offspring(x, y)))
         if not self.single_offspring:
-            offspring.add_offspring(Individual(self._get_offspring(x, y)))
-            offspring.add_offspring(Individual(self._get_offspring(y, x)))
-        else:
-            offspring.add_offspring(Individual(self._get_offspring(x, y)))
-
+            offspring.append(Individual(self._get_offspring(y, x)))
         return offspring
 
     def _get_offspring(self, x: Individual, y: Individual) -> PermutationChromosome:
@@ -241,7 +224,7 @@ class UniformCrossover(CrossoverOperator):
         super().__init__(single_offspring)
         self._probability = probability
 
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
         first_offspring = x.chromosome.copy()
         second_offspring = y.chromosome.copy()
         if isinstance(first_offspring, PermutationChromosome) or isinstance(second_offspring, PermutationChromosome):
@@ -254,10 +237,9 @@ class UniformCrossover(CrossoverOperator):
             if random.random() < self.probability:
                 self.swap(first_offspring, second_offspring, i)
 
-        offspring = Offspring()
-        offspring.add_offspring(Individual(first_offspring))
+        offspring = [Individual(first_offspring)]
         if not self.single_offspring:
-            offspring.add_offspring(Individual(second_offspring))
+            offspring.append(Individual(second_offspring))
 
         return offspring
 

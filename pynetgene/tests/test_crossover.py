@@ -1,5 +1,5 @@
 import pytest
-from pynetgene.core import Individual, Offspring
+from pynetgene.core import Individual
 from pynetgene.chromosome import Chromosome, PermutationChromosome
 from pynetgene.exception import CrossoverException
 from pynetgene.chromosome import FloatGene, FloatChromosome, BitChromosome, IntegerChromosome, BitGene, IntegerGene
@@ -20,7 +20,9 @@ def test_one_point_crossover_funct1():
     ind_y = Individual(chromosome_y)
     op_crossover = OnePointCrossover()
     offspring = op_crossover.recombine(ind_x, ind_y)
-    assert offspring.get_size() == 2
+    assert len(offspring) == 2
+    ch1 = offspring[0].chromosome
+    print("len: ", len(ch1))
     genes_ch1 = offspring[0].chromosome.to_list()
     genes_ch2 = offspring[1].chromosome.to_list()
     set_x = set(chromosome_x.to_list())
@@ -45,7 +47,7 @@ def test_one_point_crossover_funct2():
     ind_y = Individual(chromosome_y)
     op_crossover = OnePointCrossover()
     offspring = op_crossover.recombine(ind_x, ind_y)
-    assert offspring.get_size() == 2
+    assert len(offspring) == 2
     genes_ch1 = offspring[0].chromosome.to_list()
     genes_ch2 = offspring[1].chromosome.to_list()
     set_x = set(chromosome_x.to_list())
@@ -71,7 +73,7 @@ def test_one_point_crossover_funct3():
     ind_y = Individual(chromosome_y)
     op_crossover = OnePointCrossover()
     offspring = op_crossover.recombine(ind_x, ind_y)
-    assert offspring.get_size() == 2
+    assert len(offspring) == 2
     genes_ch1 = offspring[0].chromosome.to_list()
     genes_ch2 = offspring[1].chromosome.to_list()
     set_x = set(chromosome_x.to_list())
@@ -96,7 +98,7 @@ def test_fixed_point_crossover_funct1():
     ind_y = Individual(chromosome_y)
     op_crossover = FixedPointCrossover(10)
     offspring = op_crossover.recombine(ind_x, ind_y)
-    assert offspring.get_size() == 2
+    assert len(offspring) == 2
     genes_ch1 = offspring[0].chromosome.to_list()
     genes_ch2 = offspring[1].chromosome.to_list()
     set_x = set(chromosome_x.to_list())
@@ -122,7 +124,7 @@ def test_fixed_point_crossover_funct2():
     crossover_point = 3
     op_crossover = FixedPointCrossover(crossover_point)
     offspring = op_crossover.recombine(ind_x, ind_y)
-    assert offspring.get_size() == 2
+    assert len(offspring) == 2
     genes_ch1 = offspring[0].chromosome.to_list()
     genes_ch2 = offspring[1].chromosome.to_list()
     assert genes_ch1[:crossover_point] == chromosome_x.to_list()[:crossover_point]
@@ -193,8 +195,8 @@ def test_two_point_crossover_funct1():
     ind_y = Individual(chromosome_y)
     op_crossover = TwoPointCrossover()
     offspring = op_crossover.recombine(ind_x, ind_y)
-    assert offspring.get_individuals()[0].chromosome.to_list() != [1, 2, 3, 4, 5], "Genes should be swapped"
-    assert offspring.get_individuals()[0].chromosome.to_list() != [5, 4, 3, 2, 1], "Genes should be swapped"
+    assert offspring[0].chromosome.to_list() != [1, 2, 3, 4, 5], "Genes should be swapped"
+    assert offspring[0].chromosome.to_list() != [5, 4, 3, 2, 1], "Genes should be swapped"
 
 def test_two_point_crossover_exception():
     # Create permutation chromosomes which should not be allowed
