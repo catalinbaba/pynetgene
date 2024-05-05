@@ -173,9 +173,9 @@ class GeneticAlgorithm:
             for _ in range(limit):
                 if len(individual_stream) >= limit:  # if limit is reached
                     break
-                couple = self._parents_supplier()  #extract two parents from the population
+                couple = self._generate_parents()  #extract two parents from the population
                 offspring = self._crossover(couple)  #create offspring
-                for child in offspring.get_individuals():
+                for child in offspring:
                     if len(individual_stream) < limit:   #if limit is not reached
                         individual_stream.append(child)
                     else:
@@ -208,7 +208,7 @@ class GeneticAlgorithm:
     #                 if len(individual_stream) < limit:
     #                     individual_stream.append(child)
 
-    def _parents_supplier(self):
+    def _generate_parents(self):
         try:
              # Attempt to select parents using the parent selector
             parents = self._parent_selector.select_parents(self._population)
@@ -223,13 +223,10 @@ class GeneticAlgorithm:
     def _crossover(self, couple):
         # Unpack the parents from the couple
         first_parent, second_parent = couple
-
         # Generate a random value
         random_value = random.random()
-
         # Create an empty Offspring object
-        offspring = Offspring()
-
+        offspring = []
         if self._crossover_rate > random_value:
             try:
                 # Perform crossover using the crossover operator
@@ -238,13 +235,9 @@ class GeneticAlgorithm:
                 # Handle exceptions that might occur during crossover
                 logging.exception("Exception occurred crossover", e)
         else:
-            # If crossover is skipped, create a child as a copy of each parent
-            first_offspring_chromosome = first_parent.chromosome.copy()
-            offspring.add_offspring(Individual(first_offspring_chromosome))
-
+            offspring.append(Individual(first_parent.chromosome.copy()))
             if not self._crossover_operator.has_single_offspring():
-                second_offspring_chromosome = second_parent.chromosome.copy()
-                offspring.add_offspring(Individual(second_offspring_chromosome))
+                offspring.append(Individual(second_parent.chromosome.copy()))
 
         return offspring
 
