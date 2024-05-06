@@ -37,10 +37,10 @@ ga = GeneticConfiguration(elitism_size=1,
 def fitness(individual):
     chromosome = individual.chromosome
     totalDistance = 0
-    dStart = distances[0][chromosome.get_gene(0).allele]
+    dStart = distances[0][chromosome.get_gene(0)]
     for i in range(len(chromosome) -1):
-        totalDistance = totalDistance + distances[chromosome.get_gene(i).allele][chromosome.get_gene(i+1).allele]
-    dEnd = distances[chromosome.get_gene(len(chromosome)-1).allele][0]
+        totalDistance = totalDistance + distances[chromosome.get_gene(i)][chromosome.get_gene(i+1)]
+    dEnd = distances[chromosome.get_gene(len(chromosome)-1)][0]
     totalDistance = dStart + dEnd + totalDistance
     fitness_score = 1/totalDistance * 1000
     individual.fitness = fitness_score
@@ -48,7 +48,7 @@ def fitness(individual):
 
 def fitness_pythonic(individual):
     chromosome = individual.chromosome
-    alleles = [gene.allele for gene in chromosome]  # Extract alleles once using list comprehension
+    alleles = chromosome.genes # Extract alleles once using list comprehension
 
     # Calculate path distance using a generator inside the sum function
     total_distance = sum(distances[alleles[i]][alleles[i + 1]] for i in range(len(alleles) - 1))
@@ -61,10 +61,10 @@ def fitness_pythonic(individual):
 
 def calculate_distance(chromosome):
     totalDistance = 0
-    dStart = distances[0][chromosome.get_gene(0).allele]
+    dStart = distances[0][chromosome.get_gene(0)]
     for i in range(len(chromosome) - 1):
-        totalDistance = totalDistance + distances[chromosome.get_gene(i).allele][chromosome.get_gene(i + 1).allele]
-    dEnd = distances[chromosome.get_gene(len(chromosome) - 1).allele][0]
+        totalDistance = totalDistance + distances[chromosome.get_gene(i)][chromosome.get_gene(i + 1)]
+    dEnd = distances[chromosome.get_gene(len(chromosome) - 1)][0]
     totalDistance = dStart + dEnd + totalDistance
     return totalDistance
 
@@ -93,7 +93,7 @@ print("Generation: ", ga.population.generation)
 bestChromosome = ga.population.get_best_individual().chromosome
 best_route = "0->"
 for gene in bestChromosome:
-    best_route += str(gene.allele) + "->"
+    best_route += str(gene) + "->"
 best_route += "0"
 print("Best route:", best_route)
 print("Total distance:", calculate_distance(bestChromosome))

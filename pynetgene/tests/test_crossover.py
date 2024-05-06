@@ -21,8 +21,6 @@ def test_one_point_crossover_funct1():
     op_crossover = OnePointCrossover()
     offspring = op_crossover.recombine(ind_x, ind_y)
     assert len(offspring) == 2
-    ch1 = offspring[0].chromosome
-    print("len: ", len(ch1))
     genes_ch1 = offspring[0].chromosome.to_list()
     genes_ch2 = offspring[1].chromosome.to_list()
     set_x = set(chromosome_x.to_list())
@@ -149,9 +147,9 @@ def test_uniform_crossover_funct1():
     chromosome_x = IntegerChromosome()
     chromosome_y = IntegerChromosome()
     for i in range(1, 6):
-        chromosome_x.add_gene(IntegerGene(i))
+        chromosome_x.add_gene(i)
     for i in range(5, 0, -1):
-        chromosome_y.add_gene(IntegerGene(i))
+        chromosome_y.add_gene(i)
     ind_x = Individual(chromosome_x)
     ind_y = Individual(chromosome_y)
     op_crossover = UniformCrossover(probability=1.0)
@@ -188,9 +186,9 @@ def test_two_point_crossover_funct1():
     chromosome_x = IntegerChromosome()
     chromosome_y = IntegerChromosome()
     for i in range(1, 6):
-        chromosome_x.add_gene(IntegerGene(i))
+        chromosome_x.add_gene(i)
     for i in range(5, 0, -1):
-        chromosome_y.add_gene(IntegerGene(i))
+        chromosome_y.add_gene(i)
     ind_x = Individual(chromosome_x)
     ind_y = Individual(chromosome_y)
     op_crossover = TwoPointCrossover()

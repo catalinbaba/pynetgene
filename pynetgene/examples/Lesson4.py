@@ -31,13 +31,13 @@ ga = GeneticConfiguration(elitism_size=1,
 
 def fitness_function(individual):
     chromosome = individual.chromosome
-    x1 = chromosome.get_gene(0).allele
-    x2 = chromosome.get_gene(1).allele
-    x3 = chromosome.get_gene(2).allele
-    x4 = chromosome.get_gene(3).allele
-    x5 = chromosome.get_gene(4).allele
-    x6 = chromosome.get_gene(5).allele
-    x7 = chromosome.get_gene(6).allele
+    x1 = chromosome.get_gene(0)
+    x2 = chromosome.get_gene(1)
+    x3 = chromosome.get_gene(2)
+    x4 = chromosome.get_gene(3)
+    x5 = chromosome.get_gene(4)
+    x6 = chromosome.get_gene(5)
+    x7 = chromosome.get_gene(6)
     result = 3.4 * x1 - 7.5 * x2 + 21 * x3 + 1.2 * x4 - 11.3 * x5 + 2.2 * x6 - 4.7 * x7
     fitness_score = 0
     if result == 21:
@@ -49,13 +49,13 @@ def fitness_function(individual):
 
 def tracker(g: GeneticAlgorithm, r: GenerationResult):
     chromosome = r.best_individual.chromosome
-    x1 = chromosome.get_gene(0).allele
-    x2 = chromosome.get_gene(1).allele
-    x3 = chromosome.get_gene(2).allele
-    x4 = chromosome.get_gene(3).allele
-    x5 = chromosome.get_gene(4).allele
-    x6 = chromosome.get_gene(5).allele
-    x7 = chromosome.get_gene(6).allele
+    x1 = chromosome.get_gene(0)
+    x2 = chromosome.get_gene(1)
+    x3 = chromosome.get_gene(2)
+    x4 = chromosome.get_gene(3)
+    x5 = chromosome.get_gene(4)
+    x6 = chromosome.get_gene(5)
+    x7 = chromosome.get_gene(6)
     result = r.best_individual.custom_data
     print("x1: ", x1)
     print("x2: ", x2)

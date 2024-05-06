@@ -7,35 +7,37 @@ from pynetgene.gene import BitGene
 from pynetgene.gene import IntegerGene
 from pynetgene.gene import FloatGene
 import copy
+import numbers
 
 # Defining a Gene type variable
-G = TypeVar("G", bound="Gene")
+#G = TypeVar("G", bound="Gene")
+# Define a type variable that can be any subclass of `numbers.Number`
+N = TypeVar('N', bound=numbers.Number)
 
-
-class Chromosome(Generic[G], ABC):
+class Chromosome(ABC):
 
     def __init__(self):
-        self._chromosome: List[G] = []
+        self._genes = []
 
-    def get_gene(self, index: int) -> G:
-        return self._chromosome[index]
+    def get_gene(self, index: int):
+        return self._genes[index]
 
     def length(self) -> int:
-        return len(self._chromosome)
+        return len(self._genes)
 
-    def contains(self, gene: G) -> bool:
-        return gene in self._chromosome
+    def contains(self, gene) -> bool:
+        return gene in self._genes
 
     @abstractmethod
-    def add_gene(self, gene: G):
+    def add_gene(self, gene):
         pass
 
     @abstractmethod
-    def set_gene(self, index: int, gene: G):
+    def set_gene(self, index: int, gene):
         pass
 
     @abstractmethod
-    def insert_gene(self, index: int, gene: G):
+    def insert_gene(self, index: int, gene):
         pass
 
     @abstractmethod
@@ -47,163 +49,166 @@ class Chromosome(Generic[G], ABC):
         pass
 
     def __iter__(self):
-        return iter(self._chromosome)
+        return iter(self._genes)
 
     def __getitem__(self, index):
-        return self._chromosome[index]
+        return self._genes[index]
 
     def __setitem__(self, index, value):
-        self._chromosome[index] = value
+        self._genes[index] = value
 
     def __len__(self):
-        return len(self._chromosome)
+        return len(self._genes)
 
     def __str__(self):  # Centralized the __str__ method
-        return f"Chromosome:\n" + "\n".join([f"Gene {i} = {gene}" for i, gene in enumerate(self._chromosome)])
+        return f"Chromosome:\n" + "\n".join([f"Gene {i} = {gene}" for i, gene in enumerate(self._genes)])
 
 
-class BitChromosome(Chromosome[BitGene]):
+class BitChromosome(Chromosome):
     def __init__(self, size=None):
         super().__init__()
 
         if size is not None:
-            self._chromosome = [BitGene() for _ in range(size)]
+            self._genes = [random.choice([True, False]) for _ in range(size)]
         else:
-            self._chromosome = []
+            self._genes = []
 
     @property
-    def chromosome(self):
-        return self._chromosome
+    def genes(self):
+        return self._genes
 
-    @chromosome.setter
-    def chromosome(self, chromosome: List[BitGene]):
-        self._chromosome = chromosome
+    @genes.setter
+    def genes(self, genes: []):
+        self._genes = genes
 
-    def add_gene(self, gene: BitGene):
+    def add_gene(self, gene: bool):
+        if gene is not None and not isinstance(gene, bool):
+            raise ValueError("allele must be a boolean value (True or False)")
+        self._genes.append(gene)
+
+    def set_gene(self, index: int, gene: bool):
+        if gene is not None and not isinstance(gene, bool):
+            raise ValueError("allele must be a boolean value (True or False)")
+        self._genes[index] = gene
+
+    def insert_gene(self, index: int, gene: bool):
         if not isinstance(gene, BitGene):
             raise ValueError("Only BitGene can be added to a BitChromosome")
-        self._chromosome.append(gene)
-
-    def set_gene(self, index: int, gene: BitGene):
-        if not isinstance(gene, BitGene):
-            raise ValueError("Only BitGene can be added to a BitChromosome")
-        self._chromosome[index] = gene
-
-    def insert_gene(self, index: int, gene: BitGene):
-        if not isinstance(gene, BitGene):
-            raise ValueError("Only BitGene can be added to a BitChromosome")
-        self._chromosome.insert(index, gene)
+        self._genes.insert(index, gene)
 
     def to_list(self) -> List[bool]:
-        return [gene.allele for gene in self._chromosome]
+        return self._genes
 
     def copy(self) -> 'BitChromosome':
         new_chromosome = BitChromosome()
-        new_chromosome._chromosome = copy.deepcopy(self._chromosome)
+        # Since the list contains only boolean values, a shallow copy is sufficient
+        new_chromosome._genes = self._genes.copy()
         return new_chromosome
 
 
-class NumericChromosome(Chromosome, Generic[G], ABC):
-    def average(self, gene: "NumericChromosome[G]") -> "NumericChromosome[G]":
+class NumericChromosome(Chromosome, Generic[N], ABC):
+    def average(self) -> "NumericChromosome[N]":
         raise NotImplementedError
 
 
-class IntegerChromosome(NumericChromosome[IntegerGene]):
+class IntegerChromosome(NumericChromosome):
     def __init__(self, size=None, min_range=None, max_range=None):
         super().__init__()
 
         if size is not None and min_range is not None and max_range is not None:
-            self._chromosome = [IntegerGene(min_range=min_range, max_range=max_range) for _ in range(size)]
+            self._genes = [random.randint(min_range, max_range) for _ in range(size)]
         elif size is not None:
-            self._chromosome = [IntegerGene() for _ in range(size)]
+            self._genes = [random.randint(-2 ** 31, 2 ** 31 - 1) for _ in range(size)]
         else:
-            self._chromosome = []
+            self._genes = []
 
     @property
-    def chromosome(self):
-        return self._chromosome
+    def genes(self):
+        return self._genes
 
-    @chromosome.setter
-    def chromosome(self, chromosome: List[IntegerGene]):
-        self._chromosome = chromosome
+    @genes.setter
+    def genes(self, genes: List[N]):
+        self._genes = genes
 
-    def add_gene(self, gene: IntegerGene):
-        if not isinstance(gene, IntegerGene):
-            raise ValueError("Only IntegerGene can be added to a IntegerChromosome")
-        self._chromosome.append(gene)
+    def add_gene(self, gene: N):
+        if gene is not None and not isinstance(gene, int):
+            raise ValueError("allele must be of type int1")
+        self._genes.append(gene)
 
-    def set_gene(self, index: int, gene: IntegerGene):
-        if not isinstance(gene, IntegerGene):
-            raise ValueError("Only IntegerGene can be added to a IntegerChromosome")
-        self._chromosome[index] = gene
+    def set_gene(self, index: int, gene: N):
+        if gene is not None and not isinstance(gene, int):
+            raise ValueError("allele must be of type int2")
+        self._genes[index] = gene
 
-    def insert_gene(self, index: int, gene: IntegerGene):
-        if not isinstance(gene, IntegerGene):
-            raise ValueError("Only IntegerGene can be added to a IntegerChromosome")
-        self._chromosome.insert(index, gene)
+    def insert_gene(self, index: int, gene: N):
+        if gene is not None and not isinstance(gene, int):
+            raise ValueError("allele must be of type int3")
+        self._genes.insert(index, gene)
 
     def to_list(self) -> List[int]:
-        return [gene.allele for gene in self._chromosome]
+        return self._genes
 
     def copy(self) -> 'IntegerChromosome':
         new_chromosome = IntegerChromosome()
-        new_chromosome._chromosome = copy.deepcopy(self._chromosome)
+        # Since the list contains only boolean values, a shallow copy is sufficient
+        new_chromosome._genes = self._genes.copy()
         return new_chromosome
 
-    def average(self, that_chromosome: "IntegerChromosome") -> "IntegerChromosome":
-        average_chromosome = IntegerChromosome()
-        for i in range(len(self._chromosome)):
-            average_chromosome.add_gene(self._chromosome[i].average(that_chromosome.get_gene(i)))
-        return average_chromosome
+    def average(self) -> float:
+        if not self._genes:
+            raise ValueError("Chromosome is empty, cannot calculate average.")
+
+        return sum(self._genes) / len(self._genes)
 
 
-class FloatChromosome(NumericChromosome[FloatGene]):
+class FloatChromosome(NumericChromosome[N]):
     def __init__(self, size=None, min_range=None, max_range=None):
         super().__init__()
 
         if size is not None and min_range is not None and max_range is not None:
-            self._chromosome = [FloatGene(min_range=min_range, max_range=max_range) for _ in range(size)]
+            self._genes = [random.uniform(min_range, max_range) for _ in range(size)]
         elif size is not None:
-            self._chromosome = [FloatGene() for _ in range(size)]
+            self._genes = [random.gauss(0, 1) for _ in range(size)]
         else:
-            self._chromosome = []
+            self._genes = []
 
     @property
-    def chromosome(self):
-        return self._chromosome
+    def genes(self):
+        return self._genes
 
-    @chromosome.setter
-    def chromosome(self, chromosome: List[FloatGene]):
-        self._chromosome = chromosome
+    @genes.setter
+    def genes(self, genes: List[N]):
+        self._genes = genes
 
-    def add_gene(self, gene: FloatGene):
-        if not isinstance(gene, FloatGene):
-            raise ValueError("Only FloatGene can be added to a FloatChromosome")
-        self._chromosome.append(gene)
+    def add_gene(self, gene: N):
+        if not isinstance(gene, (float, int)):  # allow int because they can be implicitly converted to float
+            raise ValueError("allele must be a float value")
+        self._genes.append(gene)
 
-    def set_gene(self, index: int, gene: FloatGene):
-        if not isinstance(gene, FloatGene):
-            raise ValueError("Only FloatGene can be added to a FloatChromosome")
-        self._chromosome[index] = gene
+    def set_gene(self, index: int, gene: N):
+        if not isinstance(gene, (float, int)):  # allow int because they can be implicitly converted to float
+            raise ValueError("allele must be a float value")
+        self._genes[index] = gene
 
     def insert_gene(self, index: int, gene: FloatGene):
-        if not isinstance(gene, FloatGene):
-            raise ValueError("Only FloatGene can be added to a FloatChromosome")
-        self._chromosome.insert(index, gene)
+        if not isinstance(gene, (float, int)):  # allow int because they can be implicitly converted to float
+            raise ValueError("allele must be a float value")
+        self._genes.insert(index, gene)
 
     def to_list(self) -> List[float]:
-        return [gene.allele for gene in self._chromosome]
+        return self._genes
 
     def copy(self) -> 'FloatChromosome':
         new_chromosome = FloatChromosome()
-        new_chromosome._chromosome = copy.deepcopy(self._chromosome)
+        # Since the list contains only boolean values, a shallow copy is sufficient
+        new_chromosome._genes = self._genes.copy()
         return new_chromosome
 
-    def average(self, that_chromosome: "FloatChromosome") -> "FloatChromosome":
-        average_chromosome = FloatChromosome()
-        for i in range(len(self._chromosome)):
-            average_chromosome.add_gene(self._chromosome[i].average(that_chromosome.get_gene(i)))
-        return average_chromosome
+    def average(self) -> float:
+        if not self._genes:
+            raise ValueError("Chromosome is empty, cannot calculate average.")
+
+        return sum(self._genes) / len(self._genes)
 
 
 class PermutationChromosome(IntegerChromosome):
@@ -211,42 +216,43 @@ class PermutationChromosome(IntegerChromosome):
         super().__init__()
 
         if size is not None and start != 0:
-            self._chromosome = [IntegerGene(i + start) for i in range(size)]
-            random.shuffle(self._chromosome)
+            self._genes = [i + start for i in range(size)]
+            random.shuffle(self._genes)
         elif size is not None:
-            self._chromosome = [IntegerGene(i) for i in range(size)]
-            random.shuffle(self._chromosome)
+            self._genes = [i for i in range(size)]
+            random.shuffle(self._genes)
         else:
-            self._chromosome = []
+            self._genes = []
 
-    def set_gene(self, index: int, gene: IntegerGene):
-        if not isinstance(gene, IntegerGene):
-            raise ValueError("Only IntegerGene can be added to a PermutationChromosome")
+    def set_gene(self, index: int, gene: N):
+        if not isinstance(gene, int):
+            raise ValueError("Only int allele values can be added to a PermutationChromosome")
         if self.contains(gene):
             raise GaException(
                 "Gene with the same allele value was already added to the chromosome. Values must not be repeated in "
                 "a single chromosome.")
-        self._chromosome[index] = gene
+        self._genes[index] = gene
 
-    def add_gene(self, gene: IntegerGene):
-        if not isinstance(gene, IntegerGene):
-            raise ValueError("Only IntegerGene can be added to a PermutationChromosome")
+    def add_gene(self, gene: N):
+        if not isinstance(gene, int):
+            raise ValueError("Allele must be an int value")
         if self.contains(gene):
             raise GaException(
                 "Gene with the same allele value was already added to the chromosome. Values must not be repeated in "
                 "a single chromosome.")
-        self._chromosome.append(gene)
+        self._genes.append(gene)
 
-    def insert_gene(self, index: int, gene: IntegerGene):
-        if not isinstance(gene, IntegerGene):
-            raise ValueError("Only IntegerGene can be added to a PermutationChromosome")
+    def insert_gene(self, index: int, gene: N):
+        if not isinstance(gene, int):
+            raise ValueError("Allele must be an int value")
         if self.contains(gene):
             raise GaException(
                 "Gene with the same allele value was already added to the chromosome. Values must not be repeated in "
                 "a single chromosome.")
-        self._chromosome.insert(index, gene)
+        self._genes.insert(index, gene)
 
     def copy(self) -> 'PermutationChromosome':
         new_chromosome = PermutationChromosome()
-        new_chromosome._chromosome = copy.deepcopy(self._chromosome)
+        # Since the list contains only boolean values, a shallow copy is sufficient
+        new_chromosome._genes = self._genes.copy()
         return new_chromosome

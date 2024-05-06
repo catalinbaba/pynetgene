@@ -104,7 +104,7 @@ def fitness_integer(individual):
     chromosome = individual.chromosome
     fitness_score = 0
     for i in range(len(chromosome)):
-        if chromosome[i].allele == 1:
+        if chromosome[i] == 1:
             fitness_score += 1
     individual.fitness = fitness_score
 
@@ -232,7 +232,7 @@ def lesson1_fitness(individual):
     chromosome = individual.chromosome
     for i in range(len(chromosome)):
         gene = chromosome.get_gene(i)
-        if gene.allele == True:
+        if gene == True:
             fitness += 1
     individual.fitness = fitness
 
@@ -276,20 +276,20 @@ distances = [
 
 def calculate_distance(chromosome):
     totalDistance = 0
-    dStart = distances[0][chromosome.get_gene(0).allele]
+    dStart = distances[0][chromosome.get_gene(0)]
     for i in range(len(chromosome) - 1):
-        totalDistance = totalDistance + distances[chromosome.get_gene(i).allele][chromosome.get_gene(i + 1).allele]
-    dEnd = distances[chromosome.get_gene(len(chromosome) - 1).allele][0]
+        totalDistance = totalDistance + distances[chromosome.get_gene(i)][chromosome.get_gene(i + 1)]
+    dEnd = distances[chromosome.get_gene(len(chromosome) - 1)][0]
     totalDistance = dStart + dEnd + totalDistance
     return totalDistance
 
 def fitness(individual):
     chromosome = individual.chromosome
     totalDistance = 0
-    dStart = distances[0][chromosome.get_gene(0).allele]
+    dStart = distances[0][chromosome.get_gene(0)]
     for i in range(len(chromosome) -1):
-        totalDistance = totalDistance + distances[chromosome.get_gene(i).allele][chromosome.get_gene(i+1).allele]
-    dEnd = distances[chromosome.get_gene(len(chromosome)-1).allele][0]
+        totalDistance = totalDistance + distances[chromosome.get_gene(i)][chromosome.get_gene(i+1)]
+    dEnd = distances[chromosome.get_gene(len(chromosome)-1)][0]
     totalDistance = dStart + dEnd + totalDistance
     fitness_score = 1/totalDistance * 1000
     individual.fitness = fitness_score
@@ -326,13 +326,13 @@ def test_lesson2():
 
 def fitness_function_lesson4(individual):
     chromosome = individual.chromosome
-    x1 = chromosome.get_gene(0).allele
-    x2 = chromosome.get_gene(1).allele
-    x3 = chromosome.get_gene(2).allele
-    x4 = chromosome.get_gene(3).allele
-    x5 = chromosome.get_gene(4).allele
-    x6 = chromosome.get_gene(5).allele
-    x7 = chromosome.get_gene(6).allele
+    x1 = chromosome.get_gene(0)
+    x2 = chromosome.get_gene(1)
+    x3 = chromosome.get_gene(2)
+    x4 = chromosome.get_gene(3)
+    x5 = chromosome.get_gene(4)
+    x6 = chromosome.get_gene(5)
+    x7 = chromosome.get_gene(6)
     result = 3.4 * x1 - 7.5 * x2 + 21 * x3 + 1.2 * x4 - 11.3 * x5 + 2.2 * x6 - 4.7 * x7
     fitness_score = 0
     if result == 21:

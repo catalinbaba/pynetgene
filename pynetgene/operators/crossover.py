@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from pynetgene.core import Individual, Offspring
+from pynetgene.core import Individual
 from pynetgene.chromosome import Chromosome
 from pynetgene.chromosome import PermutationChromosome
 from pynetgene.exception import CrossoverException
 import random
+import numpy as np
 
 
 class CrossoverOperator(ABC):
@@ -13,7 +14,7 @@ class CrossoverOperator(ABC):
         self.single_offspring = single_offspring
 
     @abstractmethod
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
         pass
 
     def set_single_offspring(self, single_offspring: bool):
@@ -39,15 +40,15 @@ class OnePointCrossover(CrossoverOperator):
 
         if isinstance(first_offspring, PermutationChromosome) or isinstance(second_offspring, PermutationChromosome):
             raise CrossoverException(
-                "Cannot use One Point Crossover for Permutation Chromosome. Only Permutation Crossover Operators are "
-                "allowed")
+                "Cannot use One Point Crossover for Permutation Chromosome. Only Permutation Crossover Operators are allowed")
         if first_offspring.length() != second_offspring.length():
             raise CrossoverException("Cannot recombine chromosomes with different lengths")
 
         crossover_point = random.randint(0, first_offspring.length() - 1)
 
-        for i in range(crossover_point, first_offspring.length()):
-            self.swap(first_offspring, second_offspring, i)
+        # Optimized swapping using tuple unpacking
+        first_offspring.genes[crossover_point:], second_offspring.genes[crossover_point:] = \
+            second_offspring.genes[crossover_point:], first_offspring.genes[crossover_point:]
 
         offspring = [Individual(first_offspring)]
         if not self.single_offspring:
@@ -256,7 +257,7 @@ class TwoPointCrossover(CrossoverOperator):
     def __init__(self, single_offspring=False):
         super().__init__(single_offspring)
 
-    def recombine(self, x: Individual, y: Individual) -> Offspring:
+    def recombine(self, x: Individual, y: Individual) -> []:
         first_offspring = x.chromosome.copy()
         second_offspring = y.chromosome.copy()
 
@@ -274,10 +275,9 @@ class TwoPointCrossover(CrossoverOperator):
         for i in range(first_crossover_point, second_crossover_point):
             self.swap(first_offspring, second_offspring, i)
 
-        offspring = Offspring()
-        offspring.add_offspring(Individual(first_offspring))
+        offspring = [Individual(first_offspring)]
         if not self.single_offspring:
-            offspring.add_offspring(Individual(second_offspring))
+            offspring.append(Individual(second_offspring))
 
         return offspring
 

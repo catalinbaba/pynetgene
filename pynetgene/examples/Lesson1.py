@@ -12,7 +12,7 @@ def lesson1_fitness(individual):
     chromosome = individual.chromosome
     for i in range(len(chromosome)):
         gene = chromosome.get_gene(i)
-        if gene.allele == True:
+        if gene == True:
             fitness += 1
     individual.fitness = fitness
 
@@ -31,7 +31,7 @@ ga = GeneticConfiguration(mutator_operator=mutator,
                           target_fitness=5.0,
                           ).get_algorithm()
 population = Population()
-populationSize = 100
+populationSize = 10
 chromosomeSize =5
 
 for i in range(populationSize):
