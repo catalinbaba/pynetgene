@@ -14,6 +14,7 @@ class TaskExecutor:
         try:
             future = executor.submit(task, *args, **kwargs)
             wait([future])  # This should block until the task is done
+            result = future.result()  # Get the result to ensure task completion
         except Exception as ex:
             print("An error occurred while executing the task:", ex)
         finish = datetime.now()

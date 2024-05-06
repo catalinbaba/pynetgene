@@ -46,9 +46,8 @@ class GaussianMutator(MutatorOperator):
             rand = random.random()
             if rand < self._mutation_rate:
                 delta = random.gauss(mu=0, sigma=self._sigma)
-                value = delta + chromosome.get_gene(i).allele
-                gene = FloatGene(value)
-                chromosome.set_gene(i, gene)
+                value = delta + chromosome.get_gene(i)
+                chromosome.set_gene(i, value)
 
 class BitFlipMutator(MutatorOperator):
 
@@ -60,8 +59,8 @@ class BitFlipMutator(MutatorOperator):
         for i in range(chromosome.length()):
             rand = random.random()
             if rand < self.mutation_rate:
-                gene = BitGene(not chromosome.get_gene(i).allele)
-                chromosome.set_gene(i, gene)
+                current_gene = chromosome.get_gene(i)  # Assuming this returns a boolean
+                chromosome.set_gene(i, not current_gene)
 
 class IntegerMutator(MutatorOperator):
 
@@ -87,8 +86,7 @@ class IntegerMutator(MutatorOperator):
             rand = random.random()
             if rand < self._mutation_rate:
                 value = random.randint(self._min_range, self._max_range)
-                gene = IntegerGene(value)
-                chromosome.set_gene(i, gene)
+                chromosome.set_gene(i, value)
 
 class InversionMutator(MutatorOperator):
 
@@ -150,16 +148,14 @@ class RandomMutator(GaussianMutator):
             rand = random.random()
             if rand < self.mutation_rate:
                 delta = random.gauss(mu=0, sigma=self._sigma) * 10
-                gene = IntegerGene(int(delta))
-                chromosome.set_gene(i, gene)
+                chromosome.set_gene(i, delta)
 
     def _mutate_float_chromosome(self, chromosome):
         for i in range(chromosome.length()):
             rand = random.random()
             if rand < self.mutation_rate:
                 delta = random.gauss(mu=0, sigma=self._sigma)
-                gene = FloatGene(delta)
-                chromosome.set_gene(i, gene)
+                chromosome.set_gene(i, delta)
 
 #
 # from pynetgene.ga import Individual

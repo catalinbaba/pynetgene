@@ -298,104 +298,104 @@ class Population:
         self._population[index] = individual
 
 
-class Offspring:
-    def __init__(self):
-        self._offspring: List[Individual] = []
-
-    def add_offspring(self, individual: Individual):
-        """
-        Add a new offspring.
-
-        :param individual: Individual to add.
-        """
-        self._offspring.append(individual)
-
-    def get_offspring(self, index: int) -> Individual:
-        """
-        Get a new offspring at the specified index.
-
-        :param index: Index of the offspring.
-        :return: Offspring at the specified index.
-        """
-        return self._offspring[index]
-
-    def get_size(self) -> int:
-        """
-        Get the total number of offspring.
-
-        :return: Number of offspring.
-        """
-        return len(self._offspring)
-
-    def get_individuals(self) -> List[Individual]:
-        """
-        Get a list of individuals.
-
-        :return: List of individuals.
-        """
-        return self._offspring
-
-
-    def __getitem__(self, index: int) -> Individual:
-        """
-        Allows for bracket notation access (e.g., offspring[2]).
-
-        :param index: Index of the desired offspring.
-        :return: Offspring at the specified index.
-        """
-        return self._offspring[index]
-
-    def __setitem__(self, index: int, individual: Individual):
-        """
-        Allows for bracket notation setting (e.g., offspring[2] = new_individual).
-
-        :param index: Index where the individual should be set.
-        :param individual: New individual to place at the specified index.
-        """
-        self._offspring[index] = individual
-
-
-class Parents:
-    """
-    Parents class holds two individuals.
-    """
-
-    def __init__(self, first_individual: Individual, second_individual: Individual):
-        """
-        Create a new instance of Parents.
-
-        :param first_individual: first individual (parent)
-        :param second_individual: second individual (parent)
-        """
-        self._first_parent = first_individual
-        self._second_parent = second_individual
-
-    @property
-    def first_parent(self):
-        """
-        Get the first individual (parent).
-
-        :return: first parent
-        """
-        return self._first_parent
-
-    @property
-    def second_parent(self):
-        """
-        Get the second individual (parent).
-
-        :return: second parent
-        """
-        return self._second_parent
-
-    def get_parents(self):
-        """
-        Get both parents as a list.
-
-        :return: List with both parents
-        """
-        return [self._first_parent, self._second_parent]
-
+# class Offspring:
+#     def __init__(self):
+#         self._offspring: List[Individual] = []
+#
+#     def add_offspring(self, individual: Individual):
+#         """
+#         Add a new offspring.
+#
+#         :param individual: Individual to add.
+#         """
+#         self._offspring.append(individual)
+#
+#     def get_offspring(self, index: int) -> Individual:
+#         """
+#         Get a new offspring at the specified index.
+#
+#         :param index: Index of the offspring.
+#         :return: Offspring at the specified index.
+#         """
+#         return self._offspring[index]
+#
+#     def get_size(self) -> int:
+#         """
+#         Get the total number of offspring.
+#
+#         :return: Number of offspring.
+#         """
+#         return len(self._offspring)
+#
+#     def get_individuals(self) -> List[Individual]:
+#         """
+#         Get a list of individuals.
+#
+#         :return: List of individuals.
+#         """
+#         return self._offspring
+#
+#
+#     def __getitem__(self, index: int) -> Individual:
+#         """
+#         Allows for bracket notation access (e.g., offspring[2]).
+#
+#         :param index: Index of the desired offspring.
+#         :return: Offspring at the specified index.
+#         """
+#         return self._offspring[index]
+#
+#     def __setitem__(self, index: int, individual: Individual):
+#         """
+#         Allows for bracket notation setting (e.g., offspring[2] = new_individual).
+#
+#         :param index: Index where the individual should be set.
+#         :param individual: New individual to place at the specified index.
+#         """
+#         self._offspring[index] = individual
+#
+#
+# class Parents:
+#     """
+#     Parents class holds two individuals.
+#     """
+#
+#     def __init__(self, first_individual: Individual, second_individual: Individual):
+#         """
+#         Create a new instance of Parents.
+#
+#         :param first_individual: first individual (parent)
+#         :param second_individual: second individual (parent)
+#         """
+#         self._first_parent = first_individual
+#         self._second_parent = second_individual
+#
+#     @property
+#     def first_parent(self):
+#         """
+#         Get the first individual (parent).
+#
+#         :return: first parent
+#         """
+#         return self._first_parent
+#
+#     @property
+#     def second_parent(self):
+#         """
+#         Get the second individual (parent).
+#
+#         :return: second parent
+#         """
+#         return self._second_parent
+#
+#     def get_parents(self):
+#         """
+#         Get both parents as a list.
+#
+#         :return: List with both parents
+#         """
+#         return [self._first_parent, self._second_parent]
+#
 
 
 #

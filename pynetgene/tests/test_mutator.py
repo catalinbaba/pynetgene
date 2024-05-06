@@ -9,28 +9,28 @@ from pynetgene.operators.mutator import GaussianMutator, BitFlipMutator, Integer
 def float_individual():
     chromosome = FloatChromosome()
     for i in range(10):
-        chromosome.add_gene(FloatGene(i))
+        chromosome.add_gene(i)
     return Individual(chromosome)
 
 @pytest.fixture
 def bit_individual():
     chromosome = BitChromosome()
     for i in range(10):
-        chromosome.add_gene(BitGene(bool(i % 2)))
+        chromosome.add_gene(bool(i % 2))
     return Individual(chromosome)
 
 @pytest.fixture
 def integer_individual():
     chromosome = IntegerChromosome()
     for i in range(10):
-        chromosome.add_gene(IntegerGene(i))
+        chromosome.add_gene(i)
     return Individual(chromosome)
 
 @pytest.fixture
 def integer_individual2():
     chromosome = IntegerChromosome()
     for i in range(100):
-        chromosome.add_gene(IntegerGene(i))
+        chromosome.add_gene(i)
     return Individual(chromosome)
 
 def test_gaussian_mutator_mutation_rate():
@@ -50,25 +50,25 @@ def test_gaussian_mutator_exception(bit_individual):
 def test_gaussian_mutator_fnct1(float_individual):
     mutator = GaussianMutator()
     mutator.mutation_rate = 1.0  # Set to 100% for testing purposes
-    original_genes = [gene.allele for gene in float_individual.chromosome]
+    original_genes = float_individual.chromosome.copy()
     mutator.mutate(float_individual)
-    mutated_genes = [gene.allele for gene in float_individual.chromosome]
+    mutated_genes = float_individual.chromosome.genes
     assert any(og != mg for og, mg in zip(original_genes, mutated_genes)), "Mutation did not occur"
 
 def test_bit_flip_mutator_fnct1(bit_individual):
     mutator = BitFlipMutator()
     mutator.mutation_rate = 1.0
-    original_genes = [gene.allele for gene in bit_individual.chromosome]
+    original_genes = bit_individual.chromosome.copy()
     mutator.mutate(bit_individual)
-    mutated_genes = [gene.allele for gene in bit_individual.chromosome]
+    mutated_genes = bit_individual.chromosome.genes
     assert all(og != mg for og, mg in zip(original_genes, mutated_genes)), "Mutation did not occur as expected"
 
 def test_integer_mutator_fnct1(integer_individual):
     mutator = IntegerMutator(10,20)
     mutator.mutation_rate = 1.0  # Set to 100% for testing purposes
-    original_genes = [gene.allele for gene in integer_individual.chromosome]
+    original_genes = integer_individual.chromosome.copy()
     mutator.mutate(integer_individual)
-    mutated_genes = [gene.allele for gene in integer_individual.chromosome]
+    mutated_genes = integer_individual.chromosome.genes
     mutation_occurred = True
     # Loop through each pair of original and mutated genes
     for og, mg in zip(original_genes, mutated_genes):
@@ -80,9 +80,9 @@ def test_integer_mutator_fnct1(integer_individual):
 def test_scramble_mutator_fnct1(integer_individual2):
     mutator = ScrambleMutator()
     mutator.mutation_rate = 1.0
-    original_genes = [gene.allele for gene in integer_individual2.chromosome]
+    original_genes = integer_individual2.chromosome.copy()
     mutator.mutate(integer_individual2)
-    mutated_genes = [gene.allele for gene in integer_individual2.chromosome]
+    mutated_genes = integer_individual2.chromosome.genes
     isMutated = False
     for i in range(len(original_genes)):
         if original_genes[i] != mutated_genes[i]:
@@ -93,9 +93,9 @@ def test_scramble_mutator_fnct1(integer_individual2):
 def test_inversion_mutator_fnct1(integer_individual):
     mutator = InversionMutator()
     mutator.mutation_rate = 1.0
-    original_genes = [gene.allele for gene in integer_individual.chromosome]
+    original_genes = integer_individual.chromosome.copy()
     mutator.mutate(integer_individual)
-    mutated_genes = [gene.allele for gene in integer_individual.chromosome]
+    mutated_genes = integer_individual.chromosome.genes
     isMutated = False
     for i in range(len(original_genes)):
         if original_genes[i] != mutated_genes[i]:
@@ -106,9 +106,9 @@ def test_inversion_mutator_fnct1(integer_individual):
 def test_swap_mutator_fnct1(integer_individual):
     mutator = SwapMutator()
     mutator.mutation_rate = 1.0
-    original_genes = [gene.allele for gene in integer_individual.chromosome]
+    original_genes = integer_individual.chromosome.copy()
     mutator.mutate(integer_individual)
-    mutated_genes = [gene.allele for gene in integer_individual.chromosome]
+    mutated_genes = integer_individual.chromosome.genes
     isMutated = False
     for i in range(len(original_genes)):
         if original_genes[i] != mutated_genes[i]:
@@ -119,9 +119,9 @@ def test_swap_mutator_fnct1(integer_individual):
 def test_random_mutator_fnct1(float_individual):
     mutator = RandomMutator()
     mutator.mutation_rate = 1.0  # Set to 100% for testing purposes
-    original_genes = [gene.allele for gene in float_individual.chromosome]
+    original_genes = float_individual.chromosome.copy()
     mutator.mutate(float_individual)
-    mutated_genes = [gene.allele for gene in float_individual.chromosome]
+    mutated_genes = float_individual.chromosome.genes
     assert any(og != mg for og, mg in zip(original_genes, mutated_genes)), "Mutation did not occur"
 
 # This line allows the tests to be run via the command line
